@@ -53,8 +53,12 @@ static int16_t oneshot_time = 0;
 
 
 void send_keyboard_report(void) {
-    keyboard_report->mods  = real_mods;
-    keyboard_report->mods |= weak_mods;
+#ifndef NKRO_ENABLE
+    keyboard_report->mods  = real_mods | weak_mods;
+#else
+    keyboard_report->nkro.bits[28]  = real_mods | weak_mods;
+#endif
+
 #ifndef NO_ACTION_ONESHOT
     if (oneshot_mods) {
 #if (defined(ONESHOT_TIMEOUT) && (ONESHOT_TIMEOUT > 0))

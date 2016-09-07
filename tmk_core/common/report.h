@@ -83,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   include "protocol/lufa/descriptor.h"
 #   define KEYBOARD_REPORT_SIZE NKRO_EPSIZE
 #   define KEYBOARD_REPORT_KEYS (NKRO_EPSIZE - 2)
-#   define KEYBOARD_REPORT_BITS (NKRO_EPSIZE - 1)
+#   define KEYBOARD_REPORT_BITS NKRO_EPSIZE
 #elif defined(PROTOCOL_CHIBIOS) && defined(NKRO_ENABLE)
 #   include "protocol/chibios/usb_main.h"
 #   define KEYBOARD_REPORT_SIZE NKRO_EPSIZE
@@ -129,7 +129,6 @@ typedef union {
     };
 #ifdef NKRO_ENABLE
     struct {
-        uint8_t mods;
         uint8_t bits[KEYBOARD_REPORT_BITS];
     } nkro;
 #endif
