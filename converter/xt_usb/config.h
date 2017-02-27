@@ -45,7 +45,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * XT Pin interrupt
  */
-#ifdef XT_USE_INT
 /* uses INT1 for clock line(ATMega32U4) */
 #define XT_CLOCK_PORT  PORTD
 #define XT_CLOCK_PIN   PIND
@@ -55,8 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XT_DATA_PIN    PIND
 #define XT_DATA_DDR    DDRD
 #define XT_DATA_BIT    0
-/* optional */
-#ifdef XT_ZENITH_BLACK
 #define XT_RST_PORT    PORTB
 #define XT_RST_PIN     PINB
 #define XT_RST_DDR     DDRB
@@ -73,17 +70,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     XT_RST_DDR  &= ~(1<<XT_RST_BIT);  \
     XT_RST_PORT |=  (1<<XT_RST_BIT);  \
 } while (0)
-#endif /* XT_ZENITH_BLACK */
-#ifdef XT_ZENITH_BLACK
-#define XT_INT_INIT()  do {    \
-    EICRA |= (1<<ISC11);       \
-} while (0)
-#else
 #define XT_INT_INIT()  do {    \
     EICRA |= ((1<<ISC11) |      \
-              (1<<ISC10));      \
+              (0<<ISC10));      \
 } while (0)
-#endif /* XT_ZENITH_BLACK */
 #define XT_INT_ON()  do {      \
     EIMSK |= (1<<INT1);         \
 } while (0)
@@ -91,6 +81,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     EIMSK &= ~(1<<INT1);        \
 } while (0)
 #define XT_INT_VECT    INT1_vect
-#endif
 
 #endif

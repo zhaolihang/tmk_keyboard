@@ -52,9 +52,9 @@ void xt_host_init(void)
 {
     XT_INT_INIT();
     XT_INT_ON();
-#ifdef XT_ZENITH_BLACK
-    XT_RST_INIT();
-#endif /* XT_ZENITH_BLACK */
+#ifdef XT_RST_ENABLE
+    XT_RST();
+#endif
 }
 
 /* get data received by interrupt */
@@ -73,14 +73,9 @@ ISR(XT_INT_VECT)
     static uint8_t data = 0;
 
     if (state == 0) {
-#ifndef XT_ZENITH_BLACK
         if (data_in())
-#endif /* XT_ZENITH_BLACK */
             state++;
     } else if (state >= 1 && state <= 8) {
-#ifndef XT_ZENITH_BLACK
-        wait_clock_lo(20);
-#endif /* XT_ZENITH_BLACK */
         data >>= 1;
         if (data_in())
             data |= 0x80;
