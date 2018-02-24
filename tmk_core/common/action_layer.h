@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "action.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Default Layer
@@ -57,5 +60,10 @@ void layer_xor(uint32_t state);
 
 /* return action depending on current layer status */
 action_t layer_switch_get_action(keyevent_t key);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

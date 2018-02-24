@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMMAND_H
 #define COMMAND
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* TODO: Refactoring */
 typedef enum { ONESHOT, CONSOLE, MOUSEKEY } command_state_t;
 extern command_state_t command_state;
@@ -30,6 +35,11 @@ bool command_console_extra(uint8_t code);
 bool command_proc(uint8_t code);
 #else
 #define command_proc(code)      false
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

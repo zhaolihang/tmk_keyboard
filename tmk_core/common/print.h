@@ -42,10 +42,15 @@
 #define println(s)  xputs(PSTR(s "\r\n"))
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
+
 /* function pointer of sendchar to be used by print utility */
 void print_set_sendchar(int8_t (*print_sendchar_func)(uint8_t));
+
+#ifdef __cplusplus
+}
+#endif
 
 #elif defined(PROTOCOL_CHIBIOS) /* __AVR__ */
 

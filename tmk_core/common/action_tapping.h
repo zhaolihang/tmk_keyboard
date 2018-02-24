@@ -31,9 +31,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define WAITING_BUFFER_SIZE 8
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef NO_ACTION_TAPPING
 void action_tapping_process(keyrecord_t record);
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

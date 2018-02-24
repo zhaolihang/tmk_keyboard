@@ -93,8 +93,17 @@
 #define BOOTMAGIC_KEY_DEFAULT_LAYER_7   KC_7
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 void bootmagic(void);
 bool bootmagic_scan_key(uint16_t action);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -49,6 +49,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EECONFIG_KEYMAP_SWAP_BACKSLASH_BACKSPACE    (1<<6)
 #define EECONFIG_KEYMAP_NKRO                        (1<<7)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 bool eeconfig_is_enabled(void);
 
@@ -70,6 +74,11 @@ void eeconfig_write_keymap(uint8_t val);
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

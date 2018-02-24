@@ -27,10 +27,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef uint8_t macro_t;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #ifndef NO_ACTION_MACRO
 void action_macro_play(const macro_t *macro_p);
 #else
 #define action_macro_play(macro)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 

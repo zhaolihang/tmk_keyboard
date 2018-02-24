@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include "action.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifdef BOOTMAGIC_ENABLE
 /* NOTE: Not portable. Bit field order depends on implementation */
@@ -65,6 +69,11 @@ uint8_t keymap_fn_layer(uint8_t fn_bits);
 /* keycode to send when release Fn key without using */
 __attribute__ ((deprecated))
 uint8_t keymap_fn_keycode(uint8_t fn_bits);
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

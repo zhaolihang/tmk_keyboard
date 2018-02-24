@@ -83,6 +83,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #define PS2_LED_NUM_LOCK    1
 #define PS2_LED_CAPS_LOCK   2
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern uint8_t ps2_error;
 
@@ -92,6 +96,10 @@ uint8_t ps2_host_recv_response(void);
 uint8_t ps2_host_recv(void);
 void ps2_host_set_led(uint8_t usb_led);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 /*--------------------------------------------------------------------
  * static functions
