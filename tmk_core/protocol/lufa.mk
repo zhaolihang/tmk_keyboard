@@ -13,7 +13,7 @@ else
     include $(TMK_DIR)/$(LUFA_PATH)/LUFA/makefile
 endif
 
-LUFA_SRC = $(LUFA_DIR)/lufa.c \
+LUFA_SRC = $(LUFA_DIR)/lufa.cpp \
 	   $(LUFA_DIR)/descriptor.c \
 	   $(LUFA_SRC_USB)
 

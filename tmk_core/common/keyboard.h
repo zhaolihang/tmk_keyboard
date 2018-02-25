@@ -63,7 +63,7 @@ void keyboard_setup(void);
 /* it runs once after initializing host side protocol, debug and MCU peripherals. */
 void keyboard_init(void);
 /* it runs repeatedly in main loop */
-void keyboard_task(void);
+void keyboard_task(void(*callback)(uint8_t row,uint8_t col,bool pressed) );
 /* it runs when host LED status is updated */
 void keyboard_set_leds(uint8_t leds);
 

@@ -96,7 +96,7 @@ void keyboard_init(void)
  * Do keyboard routine jobs: scan matrix, light LEDs, ...
  * This is repeatedly called as fast as possible.
  */
-void keyboard_task(void)
+void keyboard_task(void(*callback)(uint8_t row,uint8_t col,bool pressed) )
 {
     static matrix_row_t matrix_prev[MATRIX_ROWS];
 #ifdef MATRIX_HAS_GHOST
@@ -134,6 +134,10 @@ void keyboard_task(void)
                         .pressed = (matrix_row & col_mask),
                         .time = (timer_read() | 1) /* time should not be 0 */
                     };
+
+                    if(callback){
+                        (*callback)(r,c,e.pressed);
+                    }
                     action_exec(e);
                     hook_matrix_change(e);
                     // record a processed key

