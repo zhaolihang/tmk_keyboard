@@ -9,7 +9,10 @@ TARGET_DIR ?= .
 
 # project specific files
 SRC ?=	matrix.c \
-	led.c
+	led.c \
+	malloc.c pins_teensy.c usb.c WInterrupts.c wiring.c HardwareSerial.cpp IPAddress.cpp new.cpp \
+    Print.cpp Stream.cpp Tone.cpp usb_api.cpp WMath.cpp WString.cpp yield.cpp \
+    SPI.cpp SD.cpp File.cpp Sd2Card.cpp SdFile.cpp SdVolume.cpp
 
 #
 # Keymap file
@@ -74,6 +77,8 @@ F_USB ?= $(F_CPU)
 
 # This improves response of keyboard when wakeup
 OPT_DEFS += -DSUSPEND_MODE_STANDBY
+OPT_DEFS += -DARDUINO=200
+# OPT_DEFS += -DDEBUG_ACTION
 
 # Boot Section Size in *bytes*
 #   Teensy halfKay   512
@@ -109,6 +114,9 @@ PS2_USE_INT ?= yes	# uses external interrupt for falling edge of PS/2 clock pin
 # Search Path
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
+VPATH += ./teensy
+VPATH += ./SD
+VPATH += ./SD/utility
 
 include $(TMK_DIR)/protocol.mk
 include $(TMK_DIR)/protocol/lufa.mk
